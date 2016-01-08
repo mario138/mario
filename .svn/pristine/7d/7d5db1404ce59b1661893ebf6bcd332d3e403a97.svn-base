@@ -1,0 +1,84 @@
+package com.lenove.agri.fragment;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+
+
+import com.lenove.agri.R;
+
+import android.app.Fragment;
+import android.os.Bundle;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+public class ControlFragment extends Fragment {
+
+	private static ControlFragment instance = null;
+	List<View> list = new ArrayList<View>();
+
+	private ControlFragment() {
+
+	}
+
+	public static ControlFragment getInstance() {
+		if (instance == null) {
+			instance = new ControlFragment();
+		}
+		return instance;
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.fragment_control, null);
+		ViewPager viewPager = (ViewPager) view
+				.findViewById(R.id.ControlFragment_viewpager);
+		View controlLightView = inflater.inflate(
+				R.layout.adapter_viewpager_controllight, null);
+		View controlwaterView = inflater.inflate(
+				R.layout.adapter_viewpager_controlwaterbump, null);
+		View controlbuzzerView = inflater.inflate(
+				R.layout.adapter_viewpager_controlbuzzer, null);
+		View controlfanView = inflater.inflate(
+				R.layout.adapter_viewpager_controlfan, null);
+		list.add(controlLightView);
+		list.add(controlbuzzerView);
+		list.add(controlfanView);
+		list.add(controlwaterView);
+		viewPager.setAdapter(new MyPagerAdapter());
+		return view;
+	}
+
+	class MyPagerAdapter extends PagerAdapter {
+
+		@Override
+		public int getCount() {
+			// TODO Auto-generated method stub
+			return list.size();
+		}
+
+		@Override
+		public boolean isViewFromObject(View arg0, Object arg1) {
+			// TODO Auto-generated method stub
+			return arg0 == arg1;
+		}
+
+		@Override
+		public Object instantiateItem(ViewGroup container, int position) {
+			((ViewPager) container).addView(list.get(position));
+			return list.get(position);
+		}
+
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			((ViewPager) container).removeView(list.get(position));
+
+		}
+
+	}
+}

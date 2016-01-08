@@ -1,0 +1,85 @@
+package com.lenove.agri.fragment;
+
+import android.app.Fragment;
+import android.os.Bundle;
+import android.support.v4.view.ViewPager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
+
+import com.lenove.agri.R;
+
+public class HistoryFragment extends Fragment {
+
+	private static HistoryFragment instance = null;
+
+	private Button selectButton; // 查询按钮
+	private Spinner typeSpinner; // 传感器类型
+	private Spinner timeSpinner; // 时间
+	private ViewPager historyPage;
+	
+	private String[] types = { "空气温度", "空气湿度", "土壤温度", "土壤湿度", "光照", "CO2" };
+	private String[] times = { "60秒", "5分钟" };
+
+	private HistoryFragment() {
+
+	}
+
+	public static HistoryFragment getInstance() {
+		if (instance == null) {
+			instance = new HistoryFragment();
+		}
+		return instance;
+
+	}
+
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container,
+			Bundle savedInstanceState) {
+		View view = inflater.inflate(R.layout.fragment_history, container,
+				false);
+
+		initView(view);
+
+		return view;
+	}
+
+	/**
+	 * 初始化界面组件
+	 * 
+	 * @param view
+	 */
+	private void initView(View view) {
+		// TODO Auto-generated method stub
+		selectButton = (Button) view.findViewById(R.id.history_select);
+		historyPage = (ViewPager) view.findViewById(R.id.history_view);
+		
+		selectButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				searchHistory();
+			}
+		});
+
+		typeSpinner = (Spinner) view.findViewById(R.id.history_sensortype);
+		typeSpinner.setAdapter(new ArrayAdapter<String>(getActivity(),
+				android.R.layout.simple_spinner_item, types));
+
+		timeSpinner = (Spinner) view.findViewById(R.id.history_time);
+		timeSpinner.setAdapter(new ArrayAdapter<String>(getActivity(),
+				android.R.layout.simple_spinner_item, times));
+	}
+
+	/**
+	 * 查询历史数据
+	 */
+	protected void searchHistory() {
+		// TODO Auto-generated method stub
+
+	}
+}

@@ -1,0 +1,49 @@
+package com.lenovo.hint;
+
+import android.content.Context;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.net.Uri;
+import android.view.SurfaceView;
+
+public class PlayVideo {
+	SurfaceView surfaceView;
+	MediaPlayer mediaPlayer;
+	Context context;
+	Uri uri;
+
+	public PlayVideo(SurfaceView surfaceView, Context context, Uri uri) {
+		this.surfaceView = surfaceView;
+		this.context = context;
+		this.uri = uri;
+	}
+
+	public void play() {
+		mediaPlayer = new MediaPlayer();
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		try {
+
+			mediaPlayer.setDataSource(context, uri);
+			mediaPlayer.setDisplay(surfaceView.getHolder());
+			mediaPlayer.prepareAsync();
+			mediaPlayer.setOnPreparedListener(onPreparedListener);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void stop() {
+		mediaPlayer.stop();
+		mediaPlayer.release();
+	}
+
+	OnPreparedListener onPreparedListener = new OnPreparedListener() {
+
+		@Override
+		public void onPrepared(MediaPlayer mp) {
+			mediaPlayer.start();
+		}
+	};
+
+}

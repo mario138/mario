@@ -1,0 +1,20 @@
+package com.lenove.bean;
+
+public class Config {
+
+	private int minAirTemp;
+	private int maxAirTemp;
+	private int minAirHum;
+	private int maxAirHum;
+	private int minSoilTemp;
+	private int maxSoilTemp;
+	private int minSoilHum;
+	private int maxSoilHum;
+	private int minLight;
+	private int maxLight;
+	private int minCo2;
+	private int maxCo2;
+	private int maxPM25;
+	private int autoControl;
+
+}

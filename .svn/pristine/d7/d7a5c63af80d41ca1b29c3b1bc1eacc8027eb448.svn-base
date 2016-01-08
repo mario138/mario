@@ -1,0 +1,168 @@
+package com.lenove.agri.activity;
+
+import android.app.ProgressDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.lenove.agri.MyApplication;
+import com.lenove.agri.R;
+import com.lenove.agri.dialog.FindPwdDialog;
+import com.lenove.agri.dialog.RegisterDialog;
+import com.lenove.agri.dialog.SetIpDialog;
+import com.lenove.agri.request.LoginRequest;
+
+public class LoginActivity extends BaseActivity {
+
+	private TextView setipTextView; // 设置IP
+	private EditText nameEdit;
+	private EditText passEdit;
+
+	private TextView registtTextView; // 立即注册
+	private TextView forgetPass; // 忘记密码
+	private CheckBox remPass; // 记住密码
+
+	private Button loginButton;
+
+	private ProgressDialog loginDialog;
+
+	private boolean isCheck = true;
+
+	private String name;
+	private String pass;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		// TODO Auto-generated method stub
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_login);
+
+		initView();
+	}
+
+	private void initView() {
+		// TODO Auto-generated method stub
+
+		nameEdit = (EditText) this.findViewById(R.id.login_name);
+		nameEdit.setText(MyApplication.share.getName());
+
+		passEdit = (EditText) this.findViewById(R.id.login_pass);
+		passEdit.setText(MyApplication.share.getPass());
+
+		registtTextView = (TextView) this.findViewById(R.id.login_register);
+		registtTextView.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				new RegisterDialog(LoginActivity.this).show();
+			}
+		});
+
+		forgetPass = (TextView) this.findViewById(R.id.login_forgetpass);
+		forgetPass.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				new FindPwdDialog(LoginActivity.this).show();
+			}
+		});
+
+		remPass = (CheckBox) this.findViewById(R.id.login_remberpass);
+		remPass.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+				// TODO Auto-generated method stub
+				if (!isChecked) {
+					isCheck = false;
+				} else {
+					isCheck = true;
+				}
+			}
+		});
+
+		loginButton = (Button) this.findViewById(R.id.login_login);
+		loginButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				login();
+			}
+		});
+
+		setipTextView = (TextView) this.findViewById(R.id.login_setip);
+		setipTextView.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				new SetIpDialog(LoginActivity.this).show();
+			}
+		});
+	}
+
+	/**
+	 * 登录
+	 * 
+	 * @param v
+	 */
+	private void login() {
+
+		name = nameEdit.getText().toString().trim();
+		pass = passEdit.getText().toString().trim();
+
+		if (TextUtils.isEmpty(name) || TextUtils.isEmpty(pass)) {
+			Toast.makeText(getApplicationContext(), "对不起，请补全登录信息！",
+					Toast.LENGTH_SHORT).show();
+			return;
+		}
+
+		/**
+		 * 开始登录
+		 */
+		loginDialog = new ProgressDialog(LoginActivity.this);
+		loginDialog.setMessage("正在登录...");
+		loginDialog.show();
+
+		LoginRequest request = new LoginRequest(name, pass);
+		startRequest(request);
+
+	}
+
+	@Override
+	protected void update(Object ob) {
+		// TODO Auto-generated method stub
+		if ((Boolean) ob) {
+
+			// 登录成功，保存用户名、密码
+			mAp.setUsername(name);
+			if (isCheck) {
+				MyApplication.share.setPass(pass);
+			} else {
+				MyApplication.share.setPass("");
+			}
+
+			loginDialog.cancel();
+			Toast.makeText(mAp, "登录成功！", Toast.LENGTH_SHORT).show();
+			startActivity(new Intent(getApplicationContext(),
+					MainActivity.class));
+			finish();
+		} else {
+			Toast.makeText(mAp, "登录失败！", Toast.LENGTH_SHORT).show();
+			loginDialog.cancel();
+		}
+	}
+
+}

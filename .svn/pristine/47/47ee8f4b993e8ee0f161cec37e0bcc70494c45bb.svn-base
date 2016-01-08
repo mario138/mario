@@ -1,0 +1,55 @@
+package com.lenove.agri.dialog;
+
+import android.app.Dialog;
+import android.content.Context;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import com.lenove.agri.R;
+
+public class FindPwdDialog extends Dialog{
+
+	private EditText userNameView;
+	private Button button;
+	private Context context;
+	public FindPwdDialog(Context context) {
+		super(context,R.style.dialog_style);
+		this.context = context;
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.dialog_findpw);
+		setCanceledOnTouchOutside(false);
+	}
+	
+	private void init(){
+		userNameView = (EditText) findViewById(R.id.dialog_findpw_username);
+		button = (Button) findViewById(R.id.dialog_findpw_button);
+		
+		button.setOnClickListener(new View.OnClickListener() {
+			String userName = "";
+			@Override
+			public void onClick(View arg0) {
+				userName = userNameView.getText().toString();
+				if(userName.equals("")){
+					Toast.makeText(context, "用户名不能为空", Toast.LENGTH_SHORT).show();
+				}
+				else{
+					findPassWorld(userName);
+				}
+			}
+			
+		});
+	}
+	
+	//请求忘记密码
+	private void findPassWorld(String userName2) {
+		
+	}
+	
+}

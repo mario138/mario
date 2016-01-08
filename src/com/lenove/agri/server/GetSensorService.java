@@ -1,0 +1,121 @@
+package com.lenove.agri.server;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import android.app.Service;
+import android.content.Intent;
+import android.os.IBinder;
+import android.os.Message;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.lenove.agri.MyApplication;
+import com.lenove.agri.request.GetSensorRequest;
+import com.lenove.agri.thread.HttpRequest;
+import com.lenove.bean.Sensor;
+import com.lenovo.database.Mydatabase;
+import com.lenovo.database.SensorConfig;
+
+public class GetSensorService extends Service {
+
+	public static final String TAG = "GetSensorService";
+	public static final int sensor_reuslt = 2;
+
+	private MyTimerTask mTimTask;
+	private Timer timer;
+	private MyApplication mAp;
+
+	private GetSensorRequest request;
+	private SimpleDateFormat format;
+
+	@Override
+	public IBinder onBind(Intent arg0) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void onCreate() {
+		// TODO Auto-generated method stub
+		super.onCreate();
+
+		Log.i(TAG, "GetSensorService start....");
+
+		timer = new Timer();
+		mTimTask = new MyTimerTask();
+
+		mAp = MyApplication.getInstance();
+
+		request = new GetSensorRequest();
+		format = new SimpleDateFormat("hh:mm:ss", Locale.getDefault());
+
+		timer.schedule(mTimTask, 1000, 1000);
+	}
+
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) {
+		// TODO Auto-generated method stub
+
+		Log.i(TAG, "获取传感器值服务开始启动...");
+		return super.onStartCommand(intent, flags, startId);
+	}
+
+	private class MyTimerTask extends TimerTask {
+
+		Message msg = null;
+		String resultStr = "";
+		Sensor sensor;
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+			String time = format.format(new Date());
+			resultStr = HttpRequest.start(request.getUrl(),
+					request.requestJson());
+
+			 Log.i(TAG, "请求返回传感器值：" + resultStr);
+
+			if (TextUtils.isEmpty(resultStr)) {
+				Log.e(TAG, "获取传感值，返回为null...");
+				return;
+			}
+
+			sensor = (Sensor) request.responseJson(resultStr);
+			sensor.setTime(time);
+			saveToDataBase(sensor);
+
+			msg = new Message();
+			msg.what = sensor_reuslt;
+			msg.obj = sensor;
+			if (MyApplication.handler != null) {
+				MyApplication.handler.sendMessage(msg);
+			} else {
+				Log.w(TAG, "当前保存在Application范围的Handler为null...");
+			}
+
+		}
+	}
+
+	/*
+	 * 保存传感器值到数据库中(补充完整)
+	 */
+	public void saveToDataBase(Sensor sensor) {
+		// Log.d("服务", "服务启动成功");
+		Mydatabase db = new Mydatabase(mAp);
+		db.insert(SensorConfig.Air_humidity, sensor.getAirHumid(),
+				sensor.getTime());
+		db.insert(SensorConfig.Air_temp, sensor.getAirTemp(), sensor.getTime());
+		db.insert(SensorConfig.Soil_humidity, sensor.getSoilHumid(),
+				sensor.getTime());
+		db.insert(SensorConfig.Soil_temp, sensor.getSoilTemp(),
+				sensor.getTime());
+		db.insert(SensorConfig.Co2, sensor.getCo2(), sensor.getTime());
+		db.insert(SensorConfig.light, sensor.getLight(), sensor.getTime());
+
+	}
+
+}

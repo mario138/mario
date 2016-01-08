@@ -1,0 +1,19 @@
+package com.lenove.bean;
+
+public class Mysensor {
+	private String values;
+	private String time;
+	public String getValues() {
+		return values;
+	}
+	public void setValues(String values) {
+		this.values = values;
+	}
+	public String getTime() {
+		return time;
+	}
+	public void setTime(String time) {
+		this.time = time;
+	}
+
+}
